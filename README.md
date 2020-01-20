@@ -1,6 +1,6 @@
 # tensorflow_Neural_Style_Transfer
 
-Original NST in tensorflow acoomplished in Tensorflow2.0
+Original NST accomplished in Tensorflow2.0
 
 still in work....
 
