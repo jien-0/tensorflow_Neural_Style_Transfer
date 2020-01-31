@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[11]:
-
 
 import numpy as np
 import tensorflow as tf
@@ -10,26 +8,18 @@ from PIL import Image
 from tensorflow.keras.preprocessing import image as kp_image
 import matplotlib.pyplot as plt
 
-
-# In[47]:
-
-
 def loadimg(path_to_img):
     """
     load the image and scale it to a proper size
     """
     img = Image.open(path_to_img)
     longer_dim = max(img.size)
-    max_dim = 300#像素
+    max_dim = 500 # the maximum size of the output image longer size
     scale = max_dim / longer_dim
     img = img.resize((round(img.size[0] * scale),round(img.size[1] * scale)),Image.ANTIALIAS)
     img = kp_image.img_to_array(img)
     img = np.expand_dims(img,axis = 0)
     return img
-
-
-# In[48]:
-
 
 def showimg(img):
     out = np.squeeze(img,axis = 0)
@@ -38,17 +28,10 @@ def showimg(img):
     plt.imshow(out)
 
 
-# In[49]:
-
-
 def pre_process_img(path_to_img):
     img = loadimg(path_to_img)
     img = tf.keras.applications.vgg19.preprocess_input(img)
     return img
-
-
-# In[50]:
-
 
 def deprocess_img(processed_img):
     img = processed_img.copy()
@@ -66,10 +49,6 @@ def deprocess_img(processed_img):
     
     img = np.clip(img,0,255).astype('uint8')
     return img
-
-
-# In[51]:
-
 
 def saveimg(bestimg,path):
     img = Image.fromarray(bestimg)

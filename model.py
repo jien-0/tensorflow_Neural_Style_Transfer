@@ -1,22 +1,18 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
-
-
 import tensorflow as tf
 import numpy as np
 import image
+from datetime import datetime
 from tensorflow.keras.models import Model
 from tensorflow.keras.applications import VGG19
-tf.enable_eager_execution(
-    config=None,
-    device_policy=None,
-    execution_mode=None
-)
-
-# In[3]:
-
+# tf.enable_eager_execution(
+#     config=None,
+#     device_policy=None,
+#     execution_mode=None
+# )
+                               
 
 content_layers = ['block4_conv2']
 style_layers = ['block1_conv1',
@@ -27,9 +23,6 @@ style_layers = ['block1_conv1',
                 ]
 num_content_layers = len(content_layers)
 num_style_layers = len(style_layers)
-
-
-# In[4]:
 
 
 def model_init():
@@ -54,9 +47,6 @@ def model_init():
     return model    
 
 
-# In[12]:
-
-
 def content_loss(base_content,target):
     c_loss = tf.reduce_mean(tf.square(base_content - target))/2
     return c_loss
@@ -73,9 +63,6 @@ def style_loss(base_style,target):
     h,w,c = base_style.get_shape().as_list()
     s_loss = tf.reduce_mean(tf.square(a - b))/(4*(h**2)*(w**2)*(c**2))
     return s_loss
-
-
-# In[7]:
 
 
 def get_feature_representation(model,path,mode):
@@ -98,10 +85,6 @@ def get_feature_representation(model,path,mode):
     if mode =='content':
         return [feature[0] for feature in feature_outputs[:num_content_layers]] # get the first several outputs
     
-
-
-# In[10]:
-
 
 def loss(model,loss_weights,init_image,content_features,style_features):
     """
@@ -151,19 +134,12 @@ def loss(model,loss_weights,init_image,content_features,style_features):
     return total_loss,total_content_loss,total_style_loss
     
 
-
-# In[11]:
-
-
 def compute_grads(cfg):
     with tf.GradientTape() as tape:
         allloss = loss(**cfg)
     #Compute Gradient with respect to the generated image
     total_loss = allloss[0]
     return tape.gradient(total_loss,cfg['init_image']),allloss
-
-
-# In[ ]:
 
 
 def run_nst(content_path,style_path,iteration = 1000,content_weight = 1e3,style_weight = 1):
@@ -197,35 +173,38 @@ def run_nst(content_path,style_path,iteration = 1000,content_weight = 1e3,style_
     #store the loss and the img
     best_loss, best_img = float('inf'), None
     imgs = []
+    start = datetime.now()
     for i in range(iteration):
+        
         grads, all_loss = compute_grads(cfg)
         losss, content_losss, style_losss = all_loss
         opt.apply_gradients([(grads, init_image)])
         clipped = tf.clip_by_value(init_image, min_vals, max_vals)
         init_image.assign(clipped)
+        
 
         if losss < best_loss:
             # Update best loss and best image from total loss.
             best_loss = losss
             best_img = image.deprocess_img(init_image.numpy())
 
-        if i % 500 == 0:
-            # Use the .numpy() method to get the concrete numpy array
-            plot_img = init_image.numpy()
-            plot_img = image.deprocess_img(plot_img)
-
-            path = 'output/output_' + str(i) + '.jpg'
-
-            image.saveimg(plot_img, path)
-            imgs.append(plot_img)
-#             print(losss)
-#             print(style_losss)
-#             print(content_losss)
-            print('Iteration: {}'.format(i))
+        if i % 100 == 0:
+            end = datetime.now()
+            print('[INFO]Iteration: {}'.format(i))
             print('Total loss: {:.4e}, '
                   'style loss: {:.4e}, '
                   'content loss: {:.4e}'
                   .format(losss, style_losss, content_losss))
+            print(f'100 iters takes {end -start}')
+            start = datetime.now()
+        if i % 500 == 0:
+            # Use the .numpy() method to get the concrete numpy array
+            plot_img = init_image.numpy()
+            plot_img = image.deprocess_img(plot_img)
+            path = 'output/output_' + str(i) + '.jpg'
+            image.saveimg(plot_img, path)
+            imgs.append(plot_img)
+
 
     return best_img, best_loss
     

@@ -1,17 +1,14 @@
-
+#!/usr/bin/env python
 # coding: utf-8
-
-# In[2]:
 
 
 import tensorflow as tf
 import os
 import image
 import model
-# get_ipython().run_line_magic('load_ext', 'autoreload')
-# get_ipython().run_line_magic('autoreload', '2')
-content_path = 'input/content/a.jpg'
-style_path = 'input/style/timg.jpg'
+
+content_path = 'input/content/test_content2.jpg'
+style_path = 'input/style/test_style2.jpg'
 
 # content = image.loadimg(content_path).astype('uint8')
 # style = image.loadimg(style_path).astype('uint8')
@@ -26,20 +23,8 @@ style_layers = ['block1_conv1',
                 'block4_conv1',
                 'block5_conv1'
                 ]
-# i,j = 0,0
-# for c_img in os.listdir('input/content/'):
-#     c_path = os.path.join('input/content/',c_img)
-#     os.makedirs(f'output/{i}/')
-    
-#     for s_img in os.listdir('input/style/'):
-
-#         s_path = os.path.join('input/style/',s_img)
-#         best, best_loss = model.run_nst(c_path,s_path,iteration=1000)
-#         image.saveimg(best, f'output/{i}/{j}.jpg')
-#         j += 1
-#     i += 1
-
 
 if __name__ == "__main__":
+    print(f'GPU AVAILABLE :{tf.test.is_gpu_available()}')
     best, best_loss = model.run_nst(content_path, style_path, iteration=1000)
     image.saveimg(best, 'output/output10.jpg')
