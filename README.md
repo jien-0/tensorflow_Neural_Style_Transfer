@@ -1,6 +1,6 @@
 # tensorflow_Neural_Style_Transfer
 
-Original NST accomplished in Tensorflow2.0
+Original NST accomplished in Tensorflow2.0  
 NST风格迁移原论文的tensorflow2.0实现，按照原论文使用IMAGENET预训练过的VGG19作为feature extractor
 
 ## 使用环境
